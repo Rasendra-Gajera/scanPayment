@@ -2,6 +2,25 @@
 var limit = 10;
 var start = 1;
 
+// Swal Fire Helper Function with Loader and Timer
+function showSwalWithLoader(title, icon) {
+    return Swal.fire({
+        text: title,
+        icon: icon,
+        buttonsStyling: !1,
+        confirmButtonText: "Ok, got it!",
+        customClass: { confirmButton: "btn btn-primary" },
+        timer: 5000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            Swal.showLoading();
+        },
+        willClose: () => {
+            // cleanup if needed
+        }
+    });
+}
+
 // pagination + search
 function pagination(page) {
     var search = $("#search").val();
@@ -128,22 +147,10 @@ $(document).ready(function () {
                 $("#edit_users").trigger("reset");
 
                 if (response.err === 1) {
-                    Swal.fire({
-                        text: response.msg,
-                        icon: "error",
-                        buttonsStyling: !1,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: { confirmButton: "btn btn-primary" }
-                    });
+                    showSwalWithLoader(response.msg, "error");
                 } else {
                     $("#edit-modal").modal("hide");
-                    Swal.fire({
-                        text: response.msg,
-                        icon: "success",
-                        buttonsStyling: !1,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: { confirmButton: "btn btn-primary" }
-                    });
+                    showSwalWithLoader(response.msg, "success");
                     start = 1;
                     pagination(start);
                 }
@@ -170,21 +177,9 @@ function remove(id) {
                 data: { id: id },
                 success: function (response) {
                     if (response.err === 1) {
-                        Swal.fire({
-                            text: response.msg,
-                            icon: "error",
-                            buttonsStyling: !1,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: { confirmButton: "btn btn-primary" }
-                        });
+                        showSwalWithLoader(response.msg, "error");
                     } else {
-                        Swal.fire({
-                            text: response.msg,
-                            icon: "success",
-                            buttonsStyling: !1,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: { confirmButton: "btn btn-primary" }
-                        });
+                        showSwalWithLoader(response.msg, "success");
                         start = 1;
                         pagination(start);
                     }

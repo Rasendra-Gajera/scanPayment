@@ -1,1 +1,1 @@
-# scanPayment
+# paxPayment

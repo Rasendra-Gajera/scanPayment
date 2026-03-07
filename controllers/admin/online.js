@@ -26,7 +26,7 @@ module.exports = {
 
                 const resp = await OnlineModel.updateOne(condition, updateData);
                 sendData.data = resp;
-                sendData.msg = "Online transaction updated!";
+                sendData.msg = "Transaction Completed!";
                 callback(sendData);
             } else {
                 // create new
@@ -45,7 +45,7 @@ module.exports = {
 
                 const resp = await OnlineModel.create(saveData);
                 sendData.data = resp;
-                sendData.msg = "New online transaction added";
+                sendData.msg = "Transaction Completed!";
                 callback(sendData);
             }
         } catch (error) {

@@ -1,12 +1,39 @@
 <%- include('../common/header.html')-%>
 
+<style>
+/* Modal Loader Styles */
+.modal-loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 0.35rem;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+</style>
+
 <div class="d-flex flex-column min-vh-100">
 
     <div class="d-flex justify-content-center align-items-center">
         <div class="col-md-6">
 
             <div class="card mb-4 shadow-sm text-center cursor-pointer"
-                onclick="window.location.href='<%= config.BASE_URL %>admin/online'">
+                onclick="openOnlineModal()">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center"
                     style="height: 90px;">
                     <i class="fas fa-signal fa-2x text-success mb-2"></i> <h5 class="fw-bold mb-0">Online</h5>
@@ -14,7 +41,7 @@
             </div>
 
             <div class="card mb-4 shadow-sm text-center cursor-pointer"
-                onclick="window.location.href='<%= config.BASE_URL %>admin/offline'">
+                onclick="openOfflineModal()">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center"
                     style="height: 90px;">
                     <i class="fas fa-database fa-2x text-primary mb-2"></i> <h5 class="fw-bold mb-0">Offline</h5>
@@ -30,10 +57,10 @@
             </div>
 
             <div class="card mb-4 shadow-sm text-center cursor-pointer"
-                onclick="window.location.href='<%= config.BASE_URL %>admin/settlement'">
+                onclick="openWalletModal()">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center"
                     style="height: 90px;">
-                    <i class="fas fa-file-invoice-dollar fa-2x text-danger mb-2"></i> <h5 class="fw-bold mb-0">Settlement</h5>
+                    <i class="fas fa-wallet fa-2x text-info mb-2"></i> <h5 class="fw-bold mb-0">Wallet Setting</h5>
                 </div>
             </div>
 
@@ -42,4 +69,283 @@
 
 </div>
 
+<!-- Online Transaction Modal -->
+<div class="modal fade" id="edit-modal-online" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered mw-650px">
+		<div class="modal-content rounded">
+			<div class="modal-header">
+				<h2 class="popup-title-online">Create Transaction</h2>
+				<div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+					<span class="svg-icon svg-icon-1">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+							<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="black" />
+							<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="black" />
+						</svg>
+					</span>
+				</div>
+			</div>
+			<div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-10">
+				<form id="edit_users_online" class="form" action="#">
+                    <input type="hidden" id="record_id_online" name="id" />
+					<div class="mb-4 text-center">
+					</div>
+					<!-- Card Holder Name -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Card Holder Name</label>
+                            <input type="text" class="form-control form-control-solid" 
+                                name="card_holder_name" id="card_holder_name_online" placeholder="Enter Card Holder Name" required />
+                        </div>
+                    </div>
+
+                    <!-- Card Number -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row position-relative">
+                            <label class="required fs-6 fw-bold mb-2">Card Number</label>
+                            <div class="input-group">
+                                <input type="password" maxlength="12" pattern="\d{12}" 
+                                    class="form-control form-control-solid" 
+                                    name="card_number" id="card_number_online" 
+                                    placeholder="Enter 12 digit card number" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CVV -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row position-relative">
+                            <label class="required fs-6 fw-bold mb-2">CVV</label>
+                            <div class="input-group">
+                                <input type="password" maxlength="3" pattern="\d{3}" 
+                                    class="form-control form-control-solid" 
+                                    name="cvv" id="cvv_online" 
+                                    placeholder="Enter 3 digit CVV" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Amount</label>
+                            <input type="number" class="form-control form-control-solid" 
+                                name="amount" id="amount_online" required />
+                        </div>
+                    </div>
+
+                    <!-- Expiry Date -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Expiry Date</label>
+                            <input type="date" class="form-control form-control-solid"
+                                name="expiry_date" id="expiry_date_online" required />
+                        </div>
+                    </div>
+
+                    <!-- Transaction Protocol -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Transaction Protocol</label>
+                           <select class="form-select form-select-solid" 
+                                    name="transaction_protocol" id="transaction_protocol_online" required>
+                                <option value="">Select Protocol</option>
+                                <option value="101.1">101.1</option>
+                                <option value="101.2">101.2</option>
+                                <option value="101.3">101.3</option>
+                                <option value="101.4">101.4</option>
+                                <option value="101.5">101.5</option>
+                                <option value="101.6">101.6</option>
+                                <option value="101.7">101.7</option>
+								<option value="101.8">101.8</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Auth Code -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Auth Code</label>
+                            <input type="text" class="form-control form-control-solid" 
+                                name="auth_code" id="auth_code_online" required />
+                        </div>
+                    </div>
+					
+					<div class="text-center">
+						<button type="submit" id="kt_modal_online_submit" class="btn btn-primary">
+							<span class="indicator-label">Submit</span>
+							<span class="indicator-progress">
+							<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Offline Transaction Modal -->
+<div class="modal fade" id="edit-modal-offline" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered mw-650px">
+		<div class="modal-content rounded">
+			<div class="modal-header">
+				<h2 class="popup-title-offline">Create Transaction</h2>
+				<div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+					<span class="svg-icon svg-icon-1">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+							<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="black" />
+							<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="black" />
+						</svg>
+					</span>
+				</div>
+			</div>
+			<div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-10">
+				<form id="edit_users_offline" class="form" action="#">
+                    <input type="hidden" id="record_id_offline" name="id" />
+					<div class="mb-4 text-center">
+					</div>
+					<!-- Card Holder Name -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Card Holder Name</label>
+                            <input type="text" class="form-control form-control-solid" 
+                                name="card_holder_name" id="card_holder_name_offline" placeholder="Enter Card Holder Name" required />
+                        </div>
+                    </div>
+
+                    <!-- Card Number -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row position-relative">
+                            <label class="required fs-6 fw-bold mb-2">Card Number</label>
+                            <div class="input-group">
+                                <input type="password" maxlength="12" pattern="\d{12}" 
+                                    class="form-control form-control-solid" 
+                                    name="card_number" id="card_number_offline" 
+                                    placeholder="Enter 12 digit card number" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CVV -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row position-relative">
+                            <label class="required fs-6 fw-bold mb-2">CVV</label>
+                            <div class="input-group">
+                                <input type="password" maxlength="3" pattern="\d{3}" 
+                                    class="form-control form-control-solid" 
+                                    name="cvv" id="cvv_offline" 
+                                    placeholder="Enter 3 digit CVV" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Amount</label>
+                            <input type="number" class="form-control form-control-solid" 
+                                name="amount" id="amount_offline" placeholder="Enter Amount" required />
+                        </div>
+                    </div>
+
+                    <!-- Expiry Date -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Expiry Date</label>
+                            <input type="date" class="form-control form-control-solid"
+                                name="expiry_date" id="expiry_date_offline" placeholder="Enter Expiry Date" required />
+                        </div>
+                    </div>
+
+                    <!-- Transaction Protocol -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Transaction Protocol</label>
+                            <select class="form-select form-select-solid" 
+                                    name="transaction_protocol" id="transaction_protocol_offline" required>
+                                <option value="">Select Protocol</option>
+                                <option value="201.0">201.0</option>
+                                <option value="201.1">201.1</option>
+                                <option value="201.2">201.2</option>
+                                <option value="201.3">201.3</option>
+                                <option value="201.4">201.4</option>
+                                <option value="201.5">201.5</option>
+                                <option value="201.6">201.6</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Auth Code -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Auth Code</label>
+                            <input type="text" class="form-control form-control-solid" 
+                                name="auth_code" id="auth_code_offline" required />
+                        </div>
+                    </div>
+					
+					<div class="text-center">
+						<button type="submit" id="kt_modal_offline_submit" class="btn btn-primary">
+							<span class="indicator-label">Submit</span>
+							<span class="indicator-progress">
+							<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- POS Wallet Modal -->
+<div class="modal fade" id="edit-modal-wallet" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered mw-650px">
+		<div class="modal-content rounded">
+			<div class="modal-header">
+				<h2 class="popup-title-wallet">POS Wallet</h2>
+				<div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+					<span class="svg-icon svg-icon-1">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+							<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="black" />
+							<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="black" />
+						</svg>
+					</span>
+				</div>
+			</div>
+			<div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-10">
+				<form id="edit_users_wallet" class="form" action="#">
+                    <input type="hidden" id="record_id_wallet" name="id" />
+					<div class="mb-4 text-center">
+					</div>
+					<!-- Selected Network -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Selected Network</label>
+                            <input type="text" class="form-control form-control-solid" 
+                                name="selected_network" id="selected_network_wallet" placeholder="Enter Selected Network" required />
+                        </div>
+                    </div>
+
+                    <!-- Current Wallet -->
+                    <div class="row g-9 mb-5">
+                        <div class="col-md-12 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Current Wallet</label>
+                            <input type="text" class="form-control form-control-solid" 
+                                name="current_wallet" id="current_wallet_wallet" placeholder="Enter Current Wallet" required />
+                        </div>
+                    </div>
+					
+					<div class="text-center">
+						<button type="submit" id="kt_modal_wallet_submit" class="btn btn-primary">
+							<span class="indicator-label">Submit</span>
+							<span class="indicator-progress">
+							<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="<%= config.BASE_URL %>assets/js/script/dashboard.js"></script>
 <%- include('../common/footer.html')-%>

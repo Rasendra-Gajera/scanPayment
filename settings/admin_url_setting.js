@@ -9,3 +9,6 @@ onlineUrlHandler.BindUrl();
 
 offlineUrlHandler = module.exports = require("./admin/offline_url");
 offlineUrlHandler.BindUrl();
+
+walletUrlHandler = module.exports = require("./admin/wallet_url");
+walletUrlHandler.BindUrl();
