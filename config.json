@@ -1,6 +1,6 @@
 {
-    "BASE_URL": "https://scanpayment-1.onrender.com/",
-    "PRODUCTION_BASE_URL": "https://scanpayment-1.onrender.com/",
+    "BASE_URL": "https://paxpayment.onrender.com/",
+    "PRODUCTION_BASE_URL": "https://paxpayment.onrender.com/",
     "LOCAL_BASE_URL": "http://localhost:3000/",
     "WEBSITE_NAME": "Pax Payment"
 }
