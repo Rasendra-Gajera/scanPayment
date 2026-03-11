@@ -2,5 +2,6 @@
     "BASE_URL": "https://paxpayment.onrender.com/",
     "PRODUCTION_BASE_URL": "https://paxpayment.onrender.com/",
     "LOCAL_BASE_URL": "http://localhost:3000/",
-    "WEBSITE_NAME": "Pax Payment"
+    "WEBSITE_NAME": "Pax Payment",
+    "CURRENCY_API_KEY": "fca_live_berojnWgw5SEjEynqDlKyjobQLVlfKG1ToWcJb1w"
 }

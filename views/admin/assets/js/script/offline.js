@@ -55,6 +55,7 @@ function renderTable(list) {
         htmlData += "<td>***</td>";                                 // cvv masked
         htmlData += "<td>" + (list[i].expiry_date ? new Date(list[i].expiry_date).toLocaleDateString() : "") + "</td>"; // expiry
         htmlData += "<td>" + list[i].amount + "</td>";
+        htmlData += "<td>" + (list[i].currency || '') + "</td>";
         htmlData += "<td>" + list[i].transaction_protocol + "</td>";
         htmlData += "<td>" + list[i].auth_code + "</td>";
         htmlData += "<td>" + new Date(list[i].created_at).toLocaleString() + "</td>";

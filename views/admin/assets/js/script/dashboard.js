@@ -1,10 +1,69 @@
+// fetch currency rates to populate dropdowns
+var currencyList = [];
+// map of currency codes to symbols (declare once to avoid redeclaration)
+var currencySymbolMap = currencySymbolMap || {
+    USD: '$', EUR: '€', INR: '₹', GBP: '£', JPY: '¥',
+    AUD: 'A$', CAD: 'C$', CHF: 'CHF', CNY: '¥', HKD: 'HK$',
+    NZD: 'NZ$', SEK: 'kr', KRW: '₩', SGD: 'S$', NOK: 'kr',
+    MXN: '$', BRL: 'R$', ZAR: 'R', RUB: '₽', TRY: '₺'
+};
+
+async function fetchCurrencyList() {
+    if (!CURRENCY_API_KEY) {
+        console.warn('CURRENCY_API_KEY not set; skipping currency fetch');
+        return;
+    }
+    try {
+        const res = await fetch(`https://api.freecurrencyapi.com/v1/latest?apikey=${CURRENCY_API_KEY}&base_currency=INR`);
+        const data = await res.json();
+        console.log("data:>>>>>>>>>>>>>>> ", data);
+        if (data && data.data) {
+            currencyList = Object.keys(data.data).sort();
+            populateCurrencySelectors();
+        }
+    } catch (err) {
+        console.error('Failed to load currencies', err);
+    }
+}
+
+function populateCurrencySelectors() {
+    // fill select dropdowns
+    const selects = ["#currency_online", "#currency_offline"];
+    selects.forEach(selId => {
+        const $sel = $(selId);
+        $sel.empty();
+        $sel.append('<option value="">Select</option>');
+        currencyList.forEach(code => {
+            $sel.append(`<option value="${code}">${code}</option>`);
+        });
+    });
+}
+
+// update symbol when currency changes
+function attachCurrencyListeners() {
+    $(document).on('change', '#currency_online', function () {
+        const sym = currencySymbolMap[$(this).val()] || $(this).val();
+        $('#currency_symbol_online').text(sym);
+    });
+    $(document).on('change', '#currency_offline', function () {
+        const sym = currencySymbolMap[$(this).val()] || $(this).val();
+        $('#currency_symbol_offline').text(sym);
+    });
+}
+
+// initialize currency data
+$(document).ready(function () {
+    fetchCurrencyList();
+    attachCurrencyListeners();
+});
+
 // Swal Fire Helper Function with Loader and Timer
 function showSwalWithLoader(title, icon) {
     return Swal.fire({
         text: title,
         icon: icon,
-        buttonsStyling: !1,
-        confirmButtonText: "Ok, got it!",
+        showConfirmButton: false, // This removes the "Ok" button
+        buttonsStyling: false,
         customClass: { confirmButton: "btn btn-primary" },
         timer: 5000,
         timerProgressBar: true,
@@ -23,9 +82,10 @@ function showLoaderBeforeModal(modalId) {
     let timerInterval;
     Swal.fire({
         title: 'Loading',
-        html: '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p style="margin-top: 10px;">Preparing your form...</p>',
+        html: '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>',
         allowOutsideClick: false,
         allowEscapeKey: false,
+        showConfirmButton: false, // Ensure no button appears
         didOpen: (toast) => {
             timerInterval = setInterval(() => {
                 // Progress will auto-complete
@@ -76,9 +136,9 @@ $(document).ready(function () {
                 card_holder_name: $("#card_holder_name_online").val(),
                 card_number: $("#card_number_online").val(),
                 cvv: $("#cvv_online").val(),
+                currency_symbol_online: $("#currency_symbol_online").text(),
                 expiry_date: $("#expiry_date_online").val(),
-                amount: $("#amount_online").val(),
-                transaction_protocol: $("#transaction_protocol_online").val(),
+                amount: $("#amount_online").val(), currency: $("#currency_online").val(), transaction_protocol: $("#transaction_protocol_online").val(),
                 auth_code: $("#auth_code_online").val()
             },
             success: function (response) {
@@ -134,9 +194,9 @@ $(document).ready(function () {
                 card_holder_name: $("#card_holder_name_offline").val(),
                 card_number: $("#card_number_offline").val(),
                 cvv: $("#cvv_offline").val(),
+                currency_symbol_offline: $("#currency_symbol_offline").text(),
                 expiry_date: $("#expiry_date_offline").val(),
-                amount: $("#amount_offline").val(),
-                transaction_protocol: $("#transaction_protocol_offline").val(),
+                amount: $("#amount_offline").val(), currency: $("#currency_offline").val(), transaction_protocol: $("#transaction_protocol_offline").val(),
                 auth_code: $("#auth_code_offline").val()
             },
             success: function (response) {

@@ -10,6 +10,7 @@ module.exports = {
 						res.redirect('/admin');
 					} else {
 						dashboardAdminController.GET_DASHBOARD_COUNT({}, function (respData) {
+							console.log("respData: ", respData);
 							if (respData.err !== 0) {
 								res.redirect('/admin');
 							} else {

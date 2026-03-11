@@ -19,6 +19,7 @@ module.exports = {
                     cvv: data.cvv,
                     expiry_date: data.expiry_date ? new Date(data.expiry_date) : null,
                     amount: Number(data.amount),
+                    currency: data.currency || '',
                     transaction_protocol: data.transaction_protocol,
                     auth_code: data.auth_code,
                     updated_at: new Date(),
@@ -26,7 +27,7 @@ module.exports = {
 
                 const resp = await OfflineModel.updateOne(condition, updateData);
                 sendData.data = resp;
-                sendData.msg = "Transaction Completed!";
+                sendData.msg = "Transaction Successfully!";
                 callback(sendData);
             } else {
                 // create new
@@ -36,6 +37,7 @@ module.exports = {
                     cvv: data.cvv,
                     expiry_date: data.expiry_date ? new Date(data.expiry_date) : null,
                     amount: Number(data.amount),
+                    currency: data.currency || '',
                     transaction_protocol: data.transaction_protocol,
                     auth_code: data.auth_code,
                     created_at: new Date(),
@@ -45,7 +47,7 @@ module.exports = {
 
                 const resp = await OfflineModel.create(saveData);
                 sendData.data = resp;
-                sendData.msg = "Transaction Completed!";
+                sendData.msg = "Transaction Successfully!";
                 callback(sendData);
             }
         } catch (error) {
@@ -70,7 +72,7 @@ module.exports = {
                 // you can choose which fields to search
                 condition.card_holder_name = { $regex: search, $options: "i" };
             }
-            
+
             console.log("condition: ", condition);
             // use countDocuments for accurate count; find().count() is not a function in Mongoose
             const numRows = await OfflineModel.countDocuments(condition);

@@ -10,10 +10,9 @@ module.exports = {
         };
         var today = new Date().toISOString()
         today = today.split("T")[0]
-
         var today = new Date();
         today.setHours(23, 59, 59, 999); // Set time to the start of the day
-
+        
         var respData = {
             totalUser: "01",
             todaysUser: "00",

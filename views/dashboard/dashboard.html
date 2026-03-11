@@ -1,4 +1,7 @@
 <%- include('../common/header.html')-%>
+<script>
+    const CURRENCY_API_KEY = "<%= config.CURRENCY_API_KEY %>";
+</script>
 
 <style>
 /* Modal Loader Styles */
@@ -124,12 +127,21 @@
                         </div>
                     </div>
 
-                    <!-- Amount -->
+                    <!-- Amount and Currency -->
                     <div class="row g-9 mb-5">
-                        <div class="col-md-12 fv-row">
+                        <div class="col-md-8 fv-row">
                             <label class="required fs-6 fw-bold mb-2">Amount</label>
-                            <input type="number" class="form-control form-control-solid" 
-                                name="amount" id="amount_online" required />
+                            <div class="input-group">
+                                <span class="input-group-text" id="currency_symbol_online">₹</span>
+                                <input type="number" class="form-control form-control-solid" 
+                                    name="amount" id="amount_online" required />
+                            </div>
+                        </div>
+                        <div class="col-md-4 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Currency</label>
+                            <select class="form-select form-select-solid" id="currency_online" required>
+                                <option value="">Loading...</option>
+                            </select>
                         </div>
                     </div>
 
@@ -238,12 +250,21 @@
                         </div>
                     </div>
 
-                    <!-- Amount -->
+                    <!-- Amount and Currency -->
                     <div class="row g-9 mb-5">
-                        <div class="col-md-12 fv-row">
+                        <div class="col-md-8 fv-row">
                             <label class="required fs-6 fw-bold mb-2">Amount</label>
-                            <input type="number" class="form-control form-control-solid" 
-                                name="amount" id="amount_offline" placeholder="Enter Amount" required />
+                            <div class="input-group">
+                                <span class="input-group-text" id="currency_symbol_offline">₹</span>
+                                <input type="number" class="form-control form-control-solid" 
+                                    name="amount" id="amount_offline" placeholder="Enter Amount" required />
+                            </div>
+                        </div>
+                        <div class="col-md-4 fv-row">
+                            <label class="required fs-6 fw-bold mb-2">Currency</label>
+                            <select class="form-select form-select-solid" id="currency_offline" required>
+                                <option value="">Loading...</option>
+                            </select>
                         </div>
                     </div>
 
@@ -347,5 +368,5 @@
 	</div>
 </div>
 
-<script src="<%= config.BASE_URL %>assets/js/script/dashboard.js"></script>
+<script src="<%= config.BASE_URL %>admin/assets/js/script/dashboard.js"></script>
 <%- include('../common/footer.html')-%>

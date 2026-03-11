@@ -30,6 +30,11 @@ const onlineSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
+    currency: {
+        type: String,
+        trim: true,
+        default: 'INR'
+    },
     auth_code: {
         type: String,
         required: true,
