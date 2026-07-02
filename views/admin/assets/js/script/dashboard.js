@@ -1,3 +1,4 @@
+
 // fetch currency rates to populate dropdowns
 var currencyList = [];
 // map of currency codes to symbols (declare once to avoid redeclaration)
@@ -7,7 +8,17 @@ var currencySymbolMap = currencySymbolMap || {
     NZD: 'NZ$', SEK: 'kr', KRW: '₩', SGD: 'S$', NOK: 'kr',
     MXN: '$', BRL: 'R$', ZAR: 'R', RUB: '₽', TRY: '₺'
 };
+var mode;
 
+
+console.log("BASE_URL: ", BASE_URL);
+if (BASE_URL.includes("localhost")) {
+    mode = "local";
+} else {
+    mode = "production";
+}
+console.log("mode: ", mode);
+console.log("CURRENCY_API_KEY: ", CURRENCY_API_KEY);
 async function fetchCurrencyList() {
     if (!CURRENCY_API_KEY) {
         console.warn('CURRENCY_API_KEY not set; skipping currency fetch');
@@ -74,6 +85,109 @@ function showSwalWithLoader(title, icon) {
             // cleanup if needed
         }
     });
+}
+
+function getOfflineReceiptData() {
+    return {
+        card_holder_name: $("#card_holder_name_offline").val() || "",
+        card_number: $("#card_number_offline").val() || "",
+        cvv: $("#cvv_offline").val() || "",
+        amount: $("#amount_offline").val() || "0",
+        expiry_date: $("#expiry_date_offline").val() || "",
+        transaction_protocol: $("#transaction_protocol_offline").val() || "",
+        auth_code: $("#auth_code_offline").val() || "",
+        currency: $("#currency_offline").val() || "",
+        currency_symbol: $("#currency_symbol_offline").text() || "€",
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString()
+    };
+}
+
+function formatReceiptCardNumber(number) {
+    var digits = String(number).replace(/\D/g, "");
+    if (digits.length <= 4) return digits;
+    return "**** **** **** " + digits.slice(-4);
+}
+
+function buildOfflineReceiptDocDefinition(data) {
+    var logoImage = BASE_URL + "admin/assets/media/logos/vertext_logo.png"; // default logo path'';
+
+    return {
+        pageSize: 'A4',
+        pageMargins: [40, 40, 40, 40],
+        content: [
+            { image: logoImage, width: 120, alignment: 'center', margin: [0, 0, 0, 20] },
+            { text: 'MASTER SALE RECEIPT', style: 'receiptTitle', alignment: 'center', margin: [0, 0, 0, 12] },
+            { text: 'CUSTOMER COPY', style: 'receiptSubtitle', alignment: 'center', margin: [0, 0, 0, 20] },
+            {
+                columns: [
+                    [
+                        { text: 'Withdrawal Date :', style: 'fieldLabel' },
+                        { text: 'Withdrawal Time :', style: 'fieldLabel' },
+                        { text: 'Card Holder Name :', style: 'fieldLabel' },
+                        { text: 'Card Number :', style: 'fieldLabel' },
+                        { text: 'Expiry Date :', style: 'fieldLabel' },
+                        { text: 'CVV :', style: 'fieldLabel' },
+                        { text: 'Transaction Protocol :', style: 'fieldLabel' },
+                        { text: 'Auth Code :', style: 'fieldLabel' }
+                    ],
+                    [
+                        { text: data.date, style: 'fieldValue' },
+                        { text: data.time, style: 'fieldValue' },
+                        { text: data.card_holder_name, style: 'fieldValue' },
+                        { text: formatReceiptCardNumber(data.card_number), style: 'fieldValue' },
+                        { text: data.expiry_date, style: 'fieldValue' },
+                        { text: data.cvv ? '***' : '', style: 'fieldValue' },
+                        { text: data.transaction_protocol, style: 'fieldValue' },
+                        { text: data.auth_code, style: 'fieldValue' }
+                    ]
+                ],
+                columnGap: 10,
+                margin: [0, 0, 0, 20]
+            },
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1 }] },
+            { text: 'AMOUNT : ' + data.currency_symbol + parseFloat(data.amount || 0).toFixed(2), style: 'amountLine', margin: [0, 12, 0, 4] },
+            { text: 'TOTAL : ' + data.currency_symbol + parseFloat(data.amount || 0).toFixed(2), style: 'amountLine', margin: [0, 0, 0, 20] },
+            { text: 'AUTH CODE: ' + data.auth_code, style: 'footerBold', alignment: 'center', margin: [0, 0, 0, 4] },
+            { text: 'RESPONSE CODE: 000 APPROVED', style: 'footerBold', alignment: 'center', margin: [0, 0, 0, 4] },
+            { text: 'APPROVED AUTHORISED TRANSACTION SUCCESSFUL', style: 'footerBold', alignment: 'center', margin: [0, 0, 0, 12] },
+            { text: 'Cardholder Not Present', style: 'footerNote', alignment: 'center' },
+            { text: 'Please DEBIT My Account With Total Shown', style: 'footerNote', alignment: 'center' }
+        ],
+        styles: {
+            receiptTitle: { fontSize: 18, bold: true },
+            receiptSubtitle: { fontSize: 12, bold: true },
+            fieldLabel: { fontSize: 10, bold: true },
+            fieldValue: { fontSize: 10, margin: [0, 0, 0, 8] },
+            amountLine: { fontSize: 14, bold: true },
+            footerBold: { fontSize: 11, bold: true },
+            footerNote: { fontSize: 10 }
+        }
+    };
+}
+
+function createOfflineReceiptPdf(data) {
+    if (typeof pdfMake !== 'undefined' && pdfMake.createPdf) {
+        return pdfMake.createPdf(buildOfflineReceiptDocDefinition(data));
+    }
+    return null;
+}
+
+function printOrDownloadOfflineReceipt(data) {
+    var pdf = createOfflineReceiptPdf(data);
+    if (mode === 'production') {
+        if (pdf) {
+            pdf.print();
+        } else {
+            window.open('', '_blank').document.write('<p>Printing is unavailable because pdfMake is not loaded.</p>');
+        }
+    } else {
+        if (pdf) {
+            pdf.download('offline-receipt-' + new Date().getTime() + '.pdf');
+        } else {
+            window.open('', '_blank').document.write('<p>Download is unavailable because pdfMake is not loaded.</p>');
+        }
+    }
 }
 
 // Modal Loader Helper Function - Shows before modal opens
@@ -201,13 +315,38 @@ $(document).ready(function () {
             },
             success: function (response) {
                 $(".indicator-progress").hide();
-                $("#edit_users_offline").trigger("reset");
 
                 if (response.err === 1) {
                     showSwalWithLoader(response.msg, "error");
                 } else {
-                    $("#edit-modal-offline").modal("hide");
-                    showSwalWithLoader(response.msg, "success");
+                    const sendData = {
+                        card_holder_name: $("#card_holder_name_offline").val(),
+                        card_number: $("#card_number_offline").val(),
+                        cvv: $("#cvv_offline").val(),
+                        expiry_date: $("#expiry_date_offline").val(),
+                        amount: $("#amount_offline").val(),
+                        currency_symbol: $("#currency_symbol_offline").text(),
+                        transaction_protocol: $("#transaction_protocol_offline").val(),
+                        auth_code: $("#auth_code_offline").val(),
+                        mode: mode
+                    };
+                    console.log("sendData: ", sendData);
+                    $.ajax({
+                        url: BASE_URL + "admin/receipt",
+                        type: "POST",
+                        data: sendData,
+                        success: function (receiptHtml) {
+                            if (mode == "local") {
+                                downloadReceiptPDF(receiptHtml);
+                            } else {
+                                printReceipt(receiptHtml);
+                            }
+                            $("#edit-modal-offline").modal("hide");
+                            showSwalWithLoader(response.msg, "success");
+                        }
+                    });
+                $("#edit_users_offline").trigger("reset");
+
                 }
             }
         });
@@ -218,6 +357,45 @@ $(document).ready(function () {
         resetOffline();
     });
 });
+
+function printReceipt(html) {
+    const win = window.open("", "_blank", "width=400,height=700");
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+}
+
+function downloadReceiptPDF(html) {
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    document.body.appendChild(container);
+    const receipt = container.querySelector(".receipt");
+    const opt = {
+        margin: 0,
+        filename: "Receipt.pdf",
+        image: {
+            type: "jpeg",
+            quality: 1
+        },
+        html2canvas: {
+            scale: 3
+        },
+        jsPDF: {
+            unit: "mm",
+            format: [80, 220],
+            orientation: "portrait"
+        }
+    };
+
+    html2pdf()
+        .set(opt)
+        .from(receipt)
+        .save()
+        .then(function () {
+            document.body.removeChild(container);
+        });
+
+}
 
 // Wallet Modal Functions
 function openWalletModal() {

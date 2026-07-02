@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Receipt</title>
+
+    <link rel="stylesheet" href="/admin/assets/css/receipt.css">
+
+</head>
+
+<body>
+
+<div class="receipt">
+
+    <!-- ================= Logo ================= -->
+
+    <div class="logo">
+
+        <img src="/admin/assets/media/logos/vertext_logo.png">
+
+    </div>
+
+    <div class="copy-text">
+        CUSTOMER COPY
+    </div>
+
+    <div class="retain">
+        PLEASE RETAIN RECEIPTS
+    </div>
+
+    <div class="title">
+        MASTER SALE RECEIPT
+    </div>
+
+    <div class="line"></div>
+
+    <!-- ================= Transaction ================= -->
+
+    <table class="details">
+
+        <tr>
+            <td>Withdrawal Date</td>
+            <td><%= receipt.date || "" %></td>
+        </tr>
+
+        <tr>
+            <td>Withdrawal Time</td>
+            <td><%= receipt.time || "" %></td>
+        </tr>
+
+        <tr>
+            <td>Invoice Number</td>
+            <td><%= receipt.invoice_no || "" %></td>
+        </tr>
+
+        <tr>
+            <td>Card Holder</td>
+            <td><%= receipt.card_holder_name || "" %></td>
+        </tr>
+
+        <tr>
+            <td>Card Number</td>
+            <td><%= receipt.card_number || "" %></td>
+        </tr>
+
+        <tr>
+            <td>Expiry</td>
+            <td><%= receipt.expiry_date || "" %></td>
+        </tr>
+
+        <tr>
+            <td>CVV</td>
+            <td><%= receipt.cvv || "" %></td>
+        </tr>
+
+    </table>
+
+    <div class="line"></div>
+
+    <!-- ================= MID TID ================= -->
+
+    <table class="details">
+
+        <tr>
+
+            <td>
+                MID
+            </td>
+
+            <td>
+
+                <%= receipt.mid || "" %>
+
+            </td>
+
+            <td>
+
+                TID
+
+            </td>
+
+            <td>
+
+                <%= receipt.tid || "" %>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+    <div class="line"></div>
+
+    <!-- ================= IDs ================= -->
+
+    <table class="details">
+
+        <tr>
+
+            <td>Transaction Id</td>
+
+            <td><%= receipt.transaction_id || "" %></td>
+
+        </tr>
+
+        <tr>
+
+            <td>Reference</td>
+
+            <td><%= receipt.reference || "" %></td>
+
+        </tr>
+
+        <tr>
+
+            <td>Receipt No.</td>
+
+            <td><%= receipt.receipt_no || "" %></td>
+
+        </tr>
+
+        <tr>
+
+            <td>Message No.</td>
+
+            <td><%= receipt.message_no || "" %></td>
+
+        </tr>
+
+        <tr>
+
+            <td>Protocol</td>
+
+            <td><%= receipt.transaction_protocol || "" %></td>
+
+        </tr>
+
+        <tr>
+
+            <td>Auth Code</td>
+
+            <td><%= receipt.auth_code || "" %></td>
+
+        </tr>
+
+    </table>
+
+    <div class="line"></div>
+
+    <!-- ================= Amount ================= -->
+
+    <table class="amount-table">
+
+        <tr>
+
+            <td>
+
+                AMOUNT
+
+            </td>
+
+            <td>
+
+                <%= receipt.currency_symbol %><%= receipt.amount %>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>
+
+                TOTAL
+
+            </td>
+
+            <td>
+
+                <%= receipt.currency_symbol %><%= receipt.amount %>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+    <div class="line"></div>
+
+    <!-- ================= Footer ================= -->
+
+    <div class="center bold">
+
+        RESPONSE CODE
+
+    </div>
+
+    <div class="center">
+
+        000 APPROVED
+
+    </div>
+
+    <br>
+
+    <div class="center bold">
+
+        APPROVED AUTHORISED
+
+    </div>
+
+    <div class="center bold">
+
+        TRANSACTION SUCCESSFUL
+
+    </div>
+
+    <br>
+
+    <div class="center">
+
+        Cardholder Not Present
+
+    </div>
+
+    <div class="center">
+
+        Please DEBIT My Account
+
+    </div>
+
+    <div class="center">
+
+        With Total Shown
+
+    </div>
+
+    <br>
+
+    <div class="center">
+
+        SECURITY CODE MATCH ONLY
+
+    </div>
+
+    <br>
+
+    <div class="copy-text">
+
+        MERCHANT COPY
+
+    </div>
+
+    <div class="retain">
+
+        PLEASE RETAIN RECEIPTS
+
+    </div>
+
+</div>
+
+<script>
+var mode = <%- JSON.stringify(mode || '') %>;
+
+window.onload = function () {
+    if (mode === "production") {
+        setTimeout(function () {
+            window.print();
+        }, 500);
+    }
+}
+
+window.onafterprint = function () {
+    if (mode === "production") {
+        window.close();
+    }
+}
+</script>
+
+</body>
+
+</html>

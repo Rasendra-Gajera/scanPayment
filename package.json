@@ -30,6 +30,7 @@
     "nodemailer": "^7.0.12",
     "nodemon": "^3.1.11",
     "pagination": "^0.4.6",
+    "pdfkit": "^0.19.1",
     "razorpay": "^2.9.6",
     "socket.io": "^4.8.3",
     "underscore": "^1.13.7"

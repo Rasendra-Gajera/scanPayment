@@ -120,7 +120,7 @@ $(document).ready(function () {
         Reset();
     });
 
-    $("#edit_users").on("submit", function (e) {
+    $("#online_form").on("submit", function (e) {
         e.preventDefault();
         $(".indicator-progress").css("display", "contents");
 
@@ -145,7 +145,7 @@ $(document).ready(function () {
             },
             success: function (response) {
                 $(".indicator-progress").hide();
-                $("#edit_users").trigger("reset");
+                $("#online_form").trigger("reset");
 
                 if (response.err === 1) {
                     showSwalWithLoader(response.msg, "error");

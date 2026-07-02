@@ -22,6 +22,8 @@ crypto = module.exports = require('crypto');
 request = module.exports = require('request');
 Razorpay = module.exports = require('razorpay');
 CryptoJS = module.exports = require('crypto-js');
+// PDF generation library (install with `npm install pdfkit`)
+PDFDocument = module.exports = require('pdfkit');
 
 require("dotenv").config();
 // razorpayMode = module.exports = process.env.RAZORPAY_MODE || 'test';
@@ -125,3 +127,91 @@ require('./settings/admin_url_setting.js');
 
 //admin all controller settings
 require('./settings/admin_controllers_setting.js');
+
+// // API: generate offline receipt PDF
+// // POST /api/offline/receipt
+// // Accepts JSON body with receipt fields, e.g. { card_holder_name, card_number, cvv, amount, expiry_date, transaction_protocol, auth_code, currency_symbol, mode }
+// // mode: 'local' -> forces download; 'production' -> inline (browser opens PDF)
+// app.post('/api/offline/receipt', function (req, res) {
+//     try {
+//         var data = req.body || {};
+//         var mode = (data.mode || 'local').toLowerCase();
+//         var filename = 'offline-receipt-' + Date.now() + '.pdf';
+
+//         // set headers depending on mode
+//         res.setHeader('Content-Type', 'application/pdf');
+//         if (mode === 'local') {
+//             // force download
+//             res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
+//         } else {
+//             // inline view (browser will try to open PDF)
+//             res.setHeader('Content-Disposition', 'inline; filename="' + filename + '"');
+//         }
+
+//         var doc = new PDFDocument({ size: 'A4', margin: 40 });
+
+//         // pipe PDF bytes to response
+//         doc.pipe(res);
+
+//         // Optional logo: pass data.logo as data URL (e.g. 'data:image/png;base64,...')
+//         if (data.logo && typeof data.logo === 'string' && data.logo.indexOf('base64,') !== -1) {
+//             try {
+//                 var base64Data = data.logo.split('base64,')[1];
+//                 var imgBuf = Buffer.from(base64Data, 'base64');
+//                 // draw logo centered
+//                 try { doc.image(imgBuf, { fit: [120, 80], align: 'center' }); } catch (e) { /* ignore image errors */ }
+//             } catch (e) { /* ignore image parse errors */ }
+//         }
+
+//         // Header
+//         doc.fontSize(18).text('MASTER SALE RECEIPT', { align: 'center' });
+//         doc.moveDown(0.2);
+//         doc.fontSize(11).text('CUSTOMER COPY', { align: 'center' });
+//         doc.moveDown(1);
+
+//         // Details as two-column layout
+//         var leftCol = [
+//             { k: 'Withdrawal Date', v: data.date || new Date().toLocaleDateString() },
+//             { k: 'Withdrawal Time', v: data.time || new Date().toLocaleTimeString() },
+//             { k: 'Card Holder Name', v: data.card_holder_name || '' },
+//             { k: 'Card Number', v: (data.card_number ? ('**** **** **** ' + String(data.card_number).slice(-4)) : '') },
+//             { k: 'Expiry Date', v: data.expiry_date || '' },
+//             { k: 'CVV', v: (data.cvv ? '***' : '') },
+//             { k: 'Transaction Protocol', v: data.transaction_protocol || '' },
+//             { k: 'Auth Code', v: data.auth_code || '' }
+//         ];
+
+//         var startY = doc.y;
+//         var labelX = doc.x;
+//         var valueX = 300;
+//         leftCol.forEach(function (row) {
+//             doc.fontSize(10).text(row.k + ' :', labelX, doc.y, { continued: true });
+//             doc.text(row.v, valueX);
+//         });
+
+//         doc.moveDown(1);
+//         doc.moveTo(doc.x, doc.y).lineTo(doc.page.width - doc.page.margins.right, doc.y).stroke();
+//         doc.moveDown(0.5);
+
+//         var amt = parseFloat(data.amount || 0).toFixed(2);
+//         var sym = data.currency_symbol || '€';
+//         doc.fontSize(14).text('AMOUNT : ' + sym + amt, { align: 'left' });
+//         doc.fontSize(14).text('TOTAL : ' + sym + amt, { align: 'left' });
+
+//         doc.moveDown(1);
+//         doc.fontSize(11).text('AUTH CODE: ' + (data.auth_code || ''), { align: 'center' });
+//         doc.moveDown(0.3);
+//         doc.fontSize(10).text('RESPONSE CODE: 000 APPROVED', { align: 'center' });
+//         doc.moveDown(0.5);
+//         doc.fontSize(11).text('APPROVED AUTHORISED TRANSACTION SUCCESSFUL', { align: 'center' });
+//         doc.moveDown(1);
+//         doc.fontSize(10).text('Cardholder Not Present', { align: 'center' });
+//         doc.fontSize(10).text('Please DEBIT My Account With Total Shown', { align: 'center' });
+
+//         // finalize PDF and end response
+//         doc.end();
+//     } catch (err) {
+//         console.error('PDF generation error:', err);
+//         res.status(500).send('PDF generation failed');
+//     }
+// });
